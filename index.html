@@ -63,6 +63,20 @@ header {
   align-items: start; 
 }
 
+.pos-split {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .item, .cart, .kitchen, .stats-panel { 
   background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); 
   border: 1px solid rgba(255,215,0,.35); 
@@ -481,6 +495,11 @@ canvas {
     gap: 14px; 
   }
   
+  .pos-split {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  
   header { 
     font-size: 1.5em;
     padding: 16px;
@@ -544,12 +563,16 @@ canvas {
 <header>🍔 حليمي فود - نظام POS متطور</header>
 
 <div class="toolbar">
+  <button onclick="showPage('pos')">🏠 الرئيسية</button>
+  <button onclick="showPage('kitchen')">👨‍🍳 الكوزينة</button>
   <button onclick="openAddItemModal()">➕ إضافة منتج</button>
   <button onclick="exportPDF('يومي')">📄 تقرير يومي</button>
   <button onclick="exportPDF('شهري')">📊 تقرير شهري</button>
   <button class="danger" onclick="resetSavedData()">🗑️ إعادة تعيين</button>
   <input type="text" class="search-box" id="searchBox" placeholder="🔍 ابحث عن منتج..." oninput="searchMenu()">
 </div>
+
+<div id="posPage">
 
 <div class="container">
 
@@ -576,35 +599,31 @@ canvas {
     </div>
   </div>
 
-  <!-- قائمة المنتجات -->
-  <div style="grid-column: 1 / -1;">
-    <h3>🍽️ قائمة المنتجات</h3>
-    <div class="menu" id="menu" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px;"></div>
-  </div>
-
-  <!-- سلة الطلب -->
-  <div class="cart" id="cart">
-    <h3>🛒 سلة الطلب</h3>
-    <div class="form-group">
-      <label>اسم الزبون *</label>
-      <input type="text" id="customerName" placeholder="أدخل اسم الزبون" oninput="toggleCheckoutButton()">
+  <div class="pos-split">
+    <!-- قائمة المنتجات -->
+    <div class="menu-wrapper">
+      <h3>🍽️ قائمة المنتجات</h3>
+      <div class="menu" id="menu" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px;"></div>
     </div>
-    <div id="cart-items"></div>
-    <div style="background:rgba(255,215,0,.1); padding:12px; border-radius:10px; margin:15px 0;">
-      <p style="font-size:1.1em; margin:6px 0;"><strong>المجموع:</strong> <span id="total" style="color:var(--accent); font-weight:bold; font-size:1.2em;">0</span> د.م</p>
+
+    <!-- سلة الطلب -->
+    <div class="cart" id="cart">
+      <h3>🛒 سلة الطلب</h3>
       <div class="form-group">
-        <label>المبلغ المدفوع</label>
-        <input type="number" id="payment" value="0" min="0" step="0.01">
+        <label>اسم الزبون *</label>
+        <input type="text" id="customerName" placeholder="أدخل اسم الزبون" oninput="toggleCheckoutButton()">
       </div>
-      <p style="font-size:1.05em; margin:6px 0;"><strong>الباقي:</strong> <span id="change" style="color:#64ffda; font-weight:bold;">0</span> د.م</p>
+      <div id="cart-items"></div>
+      <div style="background:rgba(255,215,0,.1); padding:12px; border-radius:10px; margin:15px 0;">
+        <p style="font-size:1.1em; margin:6px 0;"><strong>المجموع:</strong> <span id="total" style="color:var(--accent); font-weight:bold; font-size:1.2em;">0</span> د.م</p>
+        <div class="form-group">
+          <label>المبلغ المدفوع</label>
+          <input type="number" id="payment" value="0" min="0" step="0.01">
+        </div>
+        <p style="font-size:1.05em; margin:6px 0;"><strong>الباقي:</strong> <span id="change" style="color:#64ffda; font-weight:bold;">0</span> د.م</p>
+      </div>
+      <button id="checkoutBtn" class="success" onclick="checkout()" disabled style="width:100%; font-size:1.1em; padding:14px;">✅ تأكيد الطلب</button>
     </div>
-    <button id="checkoutBtn" class="success" onclick="checkout()" disabled style="width:100%; font-size:1.1em; padding:14px;">✅ تأكيد الطلب</button>
-  </div>
-
-  <!-- طلبات الكوزينة -->
-  <div class="kitchen" id="kitchen">
-    <h3>👨‍🍳 طلبات الكوزينة</h3>
-    <div id="orders"></div>
   </div>
 
   <!-- الرسم البياني (Full Width) -->
@@ -613,6 +632,17 @@ canvas {
     <canvas id="dailySalesChart" width="800" height="150" style="max-height: 150px;"></canvas>
   </div>
 
+</div>
+
+</div>
+
+<div id="kitchenPage" style="display:none;">
+  <div class="container">
+    <div class="kitchen" id="kitchen" style="grid-column: 1 / -1;">
+      <h3>👨‍🍳 طلبات الكوزينة</h3>
+      <div id="orders"></div>
+    </div>
+  </div>
 </div>
 
 <!-- نافذة إضافة منتج -->
@@ -661,6 +691,17 @@ canvas {
 
 <script>
 const { jsPDF } = window.jspdf;
+
+function showPage(page) {
+  const posPage = document.getElementById('posPage');
+  const kitchenPage = document.getElementById('kitchenPage');
+  if (!posPage || !kitchenPage) return;
+
+  const isKitchen = page === 'kitchen';
+  posPage.style.display = isKitchen ? 'none' : '';
+  kitchenPage.style.display = isKitchen ? '' : 'none';
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
 
 // البيانات الأساسية
 let menuItems = [];
@@ -1485,6 +1526,7 @@ function showAlert(message, type = 'success') {
 // ==================== التهيئة عند تحميل الصفحة ====================
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
+  showPage('pos');
   displayMenu();
   updateCart();
   updateKitchen();
