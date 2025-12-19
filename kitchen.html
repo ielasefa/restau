@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>👨‍🍳 صفحة الكوزينة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0b0f;
+      --panel: #1a1a22;
+      --accent: #FFD700;
+      --text: #f5f5f5;
+      --muted: #c7c7c7;
+      --danger: #ff4d4f;
+      --success: #52c41a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #151523 0%, var(--bg) 60%);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 12px; border: 1px solid rgba(255,215,0,.25); border-radius: 12px;
+      background: rgba(255,255,255,.04);
+    }
+    .panel-title { display:flex; align-items:center; gap:10px; margin:0; color: var(--accent); font-size:1.2em; }
+    .panel-title .icon { font-size: 1.05em; padding: 4px 12px; border: 3px solid rgba(255,215,0,.45); border-radius: 8px; background: rgba(255,215,0,.08); display:inline-block; line-height:1; }
+    .toolbar { display:flex; gap:8px; }
+    button { background: linear-gradient(180deg, var(--accent), #ffb703); color: #1a1a1a; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight:700; box-shadow:0 6px 14px rgba(255,215,0,.3); }
+    button.success { background: linear-gradient(180deg, var(--success), #73d13d); color:#fff; }
+    button.danger { background: linear-gradient(180deg, var(--danger), #ff6b6d); color:#fff; }
+    .container { margin-top: 16px; display:grid; grid-template-columns: 1fr; gap: 14px; }
+    .order-card { background: rgba(255,255,255,.04); border:1px solid rgba(255,215,0,.25); border-radius:10px; padding: 10px; }
+    .order-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding-bottom:6px; border-bottom:1px dashed rgba(255,215,0,.2); }
+    .order-number { font-weight:700; color: var(--accent); }
+    .order-time { font-size:.9em; color: var(--muted); }
+    .item-row { display:flex; align-items:center; gap:8px; background: rgba(0,0,0,.2); border-radius:6px; padding:6px; margin:4px 0; }
+    .item-thumb { width:32px; height:32px; object-fit:cover; border-radius:6px; border:3px solid rgba(255,215,0,.35); background:rgba(255,215,0,.1); }
+    .item-emoji { font-size:1.2em; padding:4px 12px; border:3px solid rgba(255,215,0,.35); border-radius:6px; background:rgba(255,215,0,.1); display:inline-block; line-height:1; }
+    .totals { margin-top:10px; padding-top:10px; border-top:1px dashed rgba(255,215,0,.2); }
+    .empty { text-align:center; color: var(--muted); padding:20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h3 class="panel-title"><span class="icon">👨‍🍳</span> طلبات الكوزينة</h3>
+    <div class="toolbar">
+      <button onclick="window.location.href='index.html'">🏠 رجوع للرئيسية</button>
+      <button onclick="renderKitchen()">🔄 تحديث</button>
+    </div>
+  </header>
+
+  <div class="container" id="orders"></div>
+
+  <script>
+    // Load data from localStorage
+    let orders = [];
+    let menuItems = [];
+
+    function loadData() {
+      try {
+        const savedOrders = localStorage.getItem('orders');
+        orders = savedOrders ? JSON.parse(savedOrders).map(o => ({...o, date: new Date(o.date)})) : [];
+      } catch(e) { orders = []; }
+      try {
+        const savedMenu = localStorage.getItem('menuItems');
+        menuItems = savedMenu ? JSON.parse(savedMenu) : [];
+      } catch(e) { menuItems = []; }
+    }
+
+    function saveOrders() {
+      localStorage.setItem('orders', JSON.stringify(orders));
+    }
+
+    function iconFor(name) {
+      if(!name) return '🍽️';
+      return name.includes('برجر') || name.includes('ساندوتش') ? '🍔'
+        : name.includes('بيتزا') ? '🍕'
+        : name.includes('شاورما') || name.includes('كباب') ? '🌮'
+        : name.includes('سلطة') ? '🥗'
+        : name.includes('مشروب') || name.includes('عصير') ? '🧃'
+        : name.includes('حلويات') || name.includes('كيك') ? '🍰'
+        : '🍽️';
+    }
+
+    function renderKitchen() {
+      const ordersDiv = document.getElementById('orders');
+      ordersDiv.innerHTML = '';
+      if(orders.length === 0) {
+        ordersDiv.innerHTML = '<div class="empty">لا توجد طلبات</div>';
+        return;
+      }
+      [...orders].reverse().forEach((order, reverseIndex) => {
+        const index = orders.length - 1 - reverseIndex;
+        const orderTime = new Date(order.date).toLocaleTimeString('ar-MA', {hour:'2-digit', minute:'2-digit'});
+        const card = document.createElement('div');
+        card.className = 'order-card';
+
+        let itemsHTML = '';
+        order.items.forEach(it => {
+          const name = it.name || '';
+          const mi = menuItems.find(m => m.name === name);
+          const thumb = mi && mi.img ? `<img class="item-thumb" src="${mi.img}" alt="${name}" onerror="this.style.display='none'">` : `<span class='item-emoji'>${iconFor(name)}</span>`;
+          itemsHTML += `<div class='item-row'>${thumb}<span style='flex:1;'>${name} × ${it.qty} = ${(it.price * it.qty).toFixed(2)} د.م</span></div>`;
+        });
+
+        card.innerHTML = `
+          <div class='order-header'>
+            <span class='order-number'>🍽️ طلب #${index + 1}</span>
+            <span class='order-time'>${orderTime}</span>
+          </div>
+          <div style='margin:8px 0;'><strong style='color:var(--accent);'>الزبون:</strong> ${order.customerName}</div>
+          ${itemsHTML}
+          <div class='totals'>
+            <strong>المجموع:</strong> ${order.total.toFixed(2)} د.م<br>
+            <strong>المدفوع:</strong> ${order.payment.toFixed(2)} د.م<br>
+            <strong>الباقي:</strong> ${order.change.toFixed(2)} د.م
+          </div>
+          <button class='success' style='width:100%; margin-top:10px;' onclick='completeOrder(${index})'>✅ تم التحضير</button>
+        `;
+        ordersDiv.appendChild(card);
+      });
+    }
+
+    function completeOrder(index) {
+      if(!confirm('هل تم تحضير هذا الطلب؟')) return;
+      orders.splice(index, 1);
+      saveOrders();
+      renderKitchen();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderKitchen();
+    });
+  </script>
+</body>
+</html>

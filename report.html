@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halimi Food - Daily Sales Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border: 2px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #FFD700;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .company-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .date-info {
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #FFD700;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dotted #ddd;
+            font-size: 14px;
+        }
+        
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .item-label {
+            color: #333;
+        }
+        
+        .item-value {
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+        }
+        
+        .total-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 2px solid #FFD700;
+            margin-top: 20px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 16px;
+        }
+        
+        .total-row.grand-total {
+            font-weight: bold;
+            font-size: 20px;
+            color: #FFD700;
+            border-top: 2px solid #FFD700;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .print-button {
+            text-align: center;
+            margin-top: 20px;
+            no-print: all;
+        }
+        
+        .print-button button {
+            padding: 12px 30px;
+            font-size: 16px;
+            background-color: #FFD700;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .print-button button:hover {
+            background-color: #ffb703;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="company-name">🍔 Halimi Food</div>
+            <div class="company-subtitle">Daily Sales Report</div>
+            <div class="date-info">
+                <strong>Date:</strong> December 19, 2025<br>
+                <strong>Report Period:</strong> Daily
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">📊 Sales Summary</div>
+            <div class="item-row">
+                <span class="item-label">Total Orders:</span>
+                <span class="item-value">1</span>
+            </div>
+            <div class="item-row">
+                <span class="item-label">Total Customers:</span>
+                <span class="item-value">1</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">🛍️ Items Sold</div>
+            <div class="item-row">
+                <span class="item-label">Product Name</span>
+                <span class="item-value">Units × Price</span>
+            </div>
+            <div class="item-row">
+                <span class="item-label">Menu Item</span>
+                <span class="item-value">1 × 5.00 DH</span>
+            </div>
+        </div>
+        
+        <div class="total-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>5.00 DH</span>
+            </div>
+            <div class="total-row">
+                <span>Tax (0%):</span>
+                <span>0.00 DH</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Revenue:</span>
+                <span>5.00 DH</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>✓ Report Generated Successfully</p>
+            <p>Halimi Food Management System</p>
+        </div>
+    </div>
+    
+    <div class="print-button">
+        <button onclick="window.print()">🖨️ Print or Save as PDF</button>
+    </div>
+</body>
+</html>
